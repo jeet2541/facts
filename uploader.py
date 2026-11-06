@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import io
+import hashlib
 from pathlib import Path
 
 import httplib2
@@ -11,6 +12,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 from google_auth_httplib2 import AuthorizedHttp
+
 
 ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config.json"
@@ -20,147 +22,148 @@ DOWNLOAD_DIR = ROOT / "downloads"
 
 VIDEO_MIME_PREFIX = "video/"
 
-# --------------------------------------------------
-# 1. TITLE GENERATOR: 12 HOOKS x 12 FORMATS = 144+
-# --------------------------------------------------
+
+# ==================================================
+# 1. TITLE GENERATOR: 144+ COMBINATIONS
+# ==================================================
 
 TITLE_HOOKS = [
     "Amazing",
     "Mind-Blowing",
     "Unbelievable",
-    "Shocking",
     "Incredible",
-    "Unknown",
+    "Shocking",
     "Fascinating",
     "Surprising",
+    "Unknown",
+    "Extraordinary",
     "Crazy",
     "Interesting",
-    "Hidden",
-    "Extraordinary"
+    "Unexplained"
 ]
 
 TITLE_FORMATS = [
-    "{hook} Facts About {topic}",
-    "What Happens When {topic}?",
-    "The Truth About {topic}",
-    "Things You Didn't Know About {topic}",
-    "Why Does {topic} Matter?",
-    "{topic}: Explained Simply",
-    "The Science Behind {topic}",
-    "What Nobody Tells You About {topic}",
-    "Discover the Secrets of {topic}",
-    "How Does {topic} Actually Work?",
-    "The Hidden Side of {topic}",
-    "You Won't Believe These Facts About {topic}"
+    "{hook} Facts You Should Know",
+    "Things That Will Blow Your Mind",
+    "The Truth You Never Knew",
+    "Facts That Sound Impossible",
+    "What Most People Don't Know",
+    "Discover Something Amazing Today",
+    "The World Is More Interesting Than You Think",
+    "You Need to Know These Facts",
+    "Prepare to Be Surprised",
+    "Knowledge That Will Amaze You",
+    "The Most Interesting Things Ever",
+    "Can You Believe This Is Real?"
 ]
 
-# --------------------------------------------------
-# 2. DESCRIPTION ROTATION
-# --------------------------------------------------
+
+# ==================================================
+# 2. DESCRIPTION GENERATOR
+# ==================================================
 
 DESCRIPTIONS = [
-    """Discover something new about {topic}!
+    """Discover something new today!
 
-In this video, we explore fascinating facts and information about {topic} that you may not have known before.
+Explore fascinating information and surprising facts in this video.
 
-Subscribe to WhatHappensFactora for more interesting facts, science, technology and knowledge.
+Subscribe to WhatHappensFactora for more amazing facts, science, technology and knowledge.
 
 #Facts #DidYouKnow #Knowledge #Shorts""",
 
-    """How much do you really know about {topic}?
+    """Your daily dose of knowledge is here!
 
-Watch till the end to discover interesting information and surprising facts.
+Learn something interesting and discover information you may not have known before.
 
-Follow WhatHappensFactora for more educational and informative videos.
+Subscribe to WhatHappensFactora for more educational videos.
 
 #AmazingFacts #InterestingFacts #Education #Shorts""",
 
-    """Explore the world of {topic} with WhatHappensFactora!
+    """The world is full of amazing discoveries!
 
-Learn something new through simple explanations, fascinating facts and useful knowledge.
-
-Subscribe for more daily discoveries.
-
-#Facts #Learning #ScienceFacts #Shorts""",
-
-    """There is always something interesting to learn about {topic}!
-
-This video brings you useful information and facts in a simple and engaging way.
-
-Subscribe to WhatHappensFactora for more discoveries.
-
-#Knowledge #FactsDaily #DidYouKnow #Shorts""",
-
-    """Let's understand {topic}!
-
-Discover the facts, explanations and interesting details behind this subject.
-
-Like, share and subscribe to WhatHappensFactora for more content.
-
-#InterestingFacts #Explained #LearnSomethingNew #Shorts""",
-
-    """Ready to learn something new?
-
-Today's topic is {topic}. Discover fascinating details and expand your knowledge with WhatHappensFactora.
-
-Subscribe for more videos!
-
-#AmazingFacts #Knowledge #Education #Shorts""",
-
-    """What makes {topic} so interesting?
-
-Watch this video to explore facts and information that make you think differently.
-
-More facts and discoveries coming on WhatHappensFactora.
-
-#MindBlowingFacts #Facts #Shorts""",
-
-    """Your daily dose of knowledge is here!
-
-Today's video explores {topic} with interesting information and easy-to-understand explanations.
-
-Subscribe to WhatHappensFactora.
-
-#DailyFacts #Learning #DidYouKnow #Shorts""",
-
-    """Learn more about {topic} in this quick and informative video.
-
-Stay curious, keep exploring and never stop learning.
+Watch this video, expand your knowledge and keep your curiosity alive.
 
 Follow WhatHappensFactora for more interesting content.
 
-#Education #InterestingFacts #Knowledge #Shorts""",
+#Facts #Learning #Discovery #Shorts""",
 
-    """The world is full of amazing things!
+    """Ready to learn something new?
 
-Today, we take a closer look at {topic} and explore some interesting details.
+Explore interesting information and fascinating facts with WhatHappensFactora.
 
-Subscribe for more facts and discoveries.
+Subscribe and never stop learning!
 
-#Discover #Facts #Science #Shorts""",
+#Knowledge #DidYouKnow #FactsDaily #Shorts""",
 
-    """Curiosity starts with a question!
+    """Curiosity makes learning exciting!
 
-Explore {topic} and discover useful facts and information in this video.
+Discover amazing information and explore the world around you.
 
-Join WhatHappensFactora for more daily knowledge.
+Subscribe to WhatHappensFactora for more facts and explanations.
 
-#Curiosity #Facts #Learning #Shorts""",
+#Curiosity #Education #InterestingFacts #Shorts""",
+
+    """There is always something new to discover!
+
+Enjoy fascinating facts, informative videos and interesting knowledge.
+
+Subscribe to WhatHappensFactora.
+
+#AmazingFacts #Knowledge #Learning #Shorts""",
+
+    """Think you know everything?
+
+Explore something new with WhatHappensFactora and discover facts that make you think.
+
+Subscribe for more!
+
+#MindBlowingFacts #Facts #Shorts""",
 
     """Welcome to WhatHappensFactora!
 
-Today's topic: {topic}
+Explore facts, science, technology, mysteries and educational content.
 
-Explore fascinating information, learn new things and discover the world around you.
+Stay curious and subscribe for more daily discoveries.
+
+#WhatHappensFactora #Facts #Education #Shorts""",
+
+    """Learning something new every day makes a difference!
+
+Watch, explore and discover interesting information with us.
+
+Subscribe to WhatHappensFactora.
+
+#DailyFacts #Knowledge #DidYouKnow #Shorts""",
+
+    """Amazing things happen all around us!
+
+Discover interesting information and fascinating facts in this video.
+
+Follow WhatHappensFactora for more discoveries.
+
+#InterestingFacts #Discover #Shorts""",
+
+    """Knowledge begins with curiosity!
+
+Explore the unknown and discover interesting facts with WhatHappensFactora.
 
 Subscribe for more informative videos.
 
-#WhatHappensFactora #Facts #Knowledge #Shorts"""
+#Learning #Facts #Knowledge #Shorts""",
+
+    """Never stop asking questions!
+
+Discover fascinating information and explore the world through facts.
+
+Subscribe to WhatHappensFactora for more.
+
+#Facts #Curiosity #Education #Shorts"""
 ]
 
-# --------------------------------------------------
+
+# ==================================================
 # 3. CHANNEL TAGS
-# --------------------------------------------------
+# ==================================================
 
 CHANNEL_TAGS = [
     "WhatHappensFactora",
@@ -178,54 +181,71 @@ CHANNEL_TAGS = [
     "YouTube Shorts"
 ]
 
-# Topic-based keyword groups
+
 TOPIC_TAGS = {
     "science": [
-        "science facts", "scientific discoveries",
-        "science explained", "experiments"
+        "science facts",
+        "scientific discoveries",
+        "science explained",
+        "experiments"
     ],
     "space": [
-        "space facts", "universe", "astronomy",
-        "planets", "NASA"
+        "space facts",
+        "universe",
+        "astronomy",
+        "planets",
+        "NASA"
     ],
     "technology": [
-        "technology facts", "tech explained",
-        "future technology", "innovation"
+        "technology facts",
+        "tech explained",
+        "future technology",
+        "innovation"
     ],
     "ai": [
-        "AI facts", "artificial intelligence",
-        "machine learning", "future of AI"
+        "AI facts",
+        "artificial intelligence",
+        "machine learning",
+        "future of AI"
     ],
     "history": [
-        "history facts", "historical facts",
+        "history facts",
+        "historical facts",
         "ancient history"
     ],
     "human": [
-        "human body facts", "human brain",
-        "biology", "body facts"
+        "human body facts",
+        "human brain",
+        "biology",
+        "body facts"
     ],
     "animal": [
-        "animal facts", "wildlife",
+        "animal facts",
+        "wildlife",
         "nature facts"
     ],
     "ocean": [
-        "ocean facts", "marine life",
+        "ocean facts",
+        "marine life",
         "sea creatures"
     ],
     "mystery": [
-        "mystery facts", "unsolved mysteries",
+        "mystery facts",
+        "unsolved mysteries",
         "strange facts"
     ],
     "world": [
-        "world facts", "geography",
-        "countries", "places"
+        "world facts",
+        "geography",
+        "countries",
+        "places"
     ]
 }
 
 
-# --------------------------------------------------
-# JSON HELPERS
-# --------------------------------------------------
+# ==================================================
+# 4. JSON HELPERS
+# ==================================================
 
 def load_json(path, default):
     if not path.exists():
@@ -240,23 +260,17 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-# --------------------------------------------------
-# TOPIC DETECTION
-# --------------------------------------------------
+# ==================================================
+# 5. TOPIC DETECTION
+# ==================================================
 
 def extract_topic(filename):
     stem = Path(filename).stem
 
-    # Replace underscores and hyphens
     stem = re.sub(r"[_-]+", " ", stem)
-
-    # Remove common file numbering
     stem = re.sub(r"^\d+[\s.]*", "", stem)
-
-    # Remove repeated spaces
     stem = re.sub(r"\s+", " ", stem).strip()
 
-    # Ignore filenames containing only numbers
     if not stem or not re.search(r"[a-zA-Z]", stem):
         return "Interesting Facts"
 
@@ -274,9 +288,10 @@ def detect_topic_tags(topic):
     return result
 
 
-# --------------------------------------------------
-# UNIQUE TITLE GENERATOR
-# --------------------------------------------------
+# ==================================================
+# 6. UNIQUE TITLE GENERATOR
+# Original filename is NEVER used in title.
+# ==================================================
 
 def generate_title(topic, history):
     used_titles = {
@@ -284,50 +299,47 @@ def generate_title(topic, history):
         for item in history.get("uploads", [])
     }
 
-    total_formats = len(TITLE_HOOKS) * len(TITLE_FORMATS)
+    total = len(TITLE_HOOKS) * len(TITLE_FORMATS)
 
-    # Rotate combinations based on upload history
-    start = len(history.get("uploads", [])) % total_formats
+    start = len(history.get("uploads", [])) % total
 
-    for offset in range(total_formats):
-        index = (start + offset) % total_formats
+    for offset in range(total):
+        index = (start + offset) % total
 
-        hook_index = index % len(TITLE_HOOKS)
-        format_index = (index // len(TITLE_HOOKS)) % len(TITLE_FORMATS)
+        hook = TITLE_HOOKS[index % len(TITLE_HOOKS)]
 
-        hook = TITLE_HOOKS[hook_index]
-        template = TITLE_FORMATS[format_index]
+        template = TITLE_FORMATS[
+            (index // len(TITLE_HOOKS)) % len(TITLE_FORMATS)
+        ]
 
-        title = template.format(
-            hook=hook,
-            topic=topic
-        )
-
-        title = re.sub(r"\s+", " ", title).strip()
-        title = title[:100].strip()
+        title = template.format(hook=hook)
 
         if title.lower() not in used_titles:
-            return title
+            return title[:100]
 
-    # Fallback if all combinations are used
-    return f"{topic} | WhatHappensFactora"[:100]
+    # Fallback: unique deterministic suffix
+    suffix = hashlib.sha256(
+        str(len(history.get("uploads", []))).encode()
+    ).hexdigest()[:6]
+
+    return f"Discover More Amazing Facts #{suffix}"[:100]
 
 
-# --------------------------------------------------
-# DESCRIPTION GENERATOR
-# --------------------------------------------------
+# ==================================================
+# 7. DESCRIPTION GENERATOR
+# ==================================================
 
 def generate_description(topic, history):
     index = len(history.get("uploads", [])) % len(DESCRIPTIONS)
 
-    description = DESCRIPTIONS[index].format(topic=topic)
+    description = DESCRIPTIONS[index]
 
     return description[:5000]
 
 
-# --------------------------------------------------
-# TAG GENERATOR
-# --------------------------------------------------
+# ==================================================
+# 8. AUTOMATIC TAG GENERATOR
+# ==================================================
 
 def generate_tags(topic, config):
     tags = []
@@ -336,14 +348,12 @@ def generate_tags(topic, config):
     tags.extend(CHANNEL_TAGS)
     tags.extend(detect_topic_tags(topic))
 
-    # Add words from the filename/topic
     words = re.findall(r"[a-zA-Z0-9]+", topic.lower())
 
     for word in words:
         if len(word) > 2:
             tags.append(word)
 
-    # Remove duplicates
     unique_tags = []
     seen = set()
 
@@ -359,31 +369,30 @@ def generate_tags(topic, config):
             seen.add(key)
             unique_tags.append(tag)
 
-    # YouTube's combined tag character limit is 500
     final_tags = []
     total_length = 0
 
     for tag in unique_tags:
-        extra_length = len(tag) + (1 if final_tags else 0)
+        extra = len(tag) + (1 if final_tags else 0)
 
-        if total_length + extra_length > 500:
+        if total_length + extra > 500:
             break
 
         final_tags.append(tag)
-        total_length += extra_length
+        total_length += extra
 
     return final_tags
 
 
-# --------------------------------------------------
-# GOOGLE API CLIENTS
-# --------------------------------------------------
+# ==================================================
+# 9. GOOGLE API CLIENTS
+# ==================================================
 
 def build_clients():
     if not TOKEN_PATH.exists():
         raise FileNotFoundError(
-            "token.json is missing. Run auth.py locally and add its full "
-            "contents as the GitHub secret YOUTUBE_TOKEN_JSON."
+            "token.json missing. Run auth.py and configure "
+            "GitHub secret YOUTUBE_TOKEN_JSON."
         )
 
     token_data = load_json(TOKEN_PATH, {})
@@ -392,7 +401,7 @@ def build_clients():
 
     if not creds.valid and not creds.refresh_token:
         raise RuntimeError(
-            "OAuth token is invalid and has no refresh token. Re-run auth.py."
+            "OAuth token invalid. Re-run auth.py."
         )
 
     authed_http = AuthorizedHttp(
@@ -417,9 +426,9 @@ def build_clients():
     return drive, youtube
 
 
-# --------------------------------------------------
-# GOOGLE DRIVE VIDEO LIST
-# --------------------------------------------------
+# ==================================================
+# 10. GOOGLE DRIVE VIDEO LIST
+# ==================================================
 
 def list_drive_videos(drive, folder_id):
     videos = []
@@ -446,9 +455,9 @@ def list_drive_videos(drive, folder_id):
     return videos
 
 
-# --------------------------------------------------
-# DOWNLOAD VIDEO
-# --------------------------------------------------
+# ==================================================
+# 11. DOWNLOAD VIDEO
+# ==================================================
 
 def download_drive_file(drive, file_id, destination):
     request = drive.files().get_media(fileId=file_id)
@@ -466,12 +475,14 @@ def download_drive_file(drive, file_id, destination):
             status, done = downloader.next_chunk()
 
             if status:
-                print(f"Download: {int(status.progress() * 100)}%")
+                print(
+                    f"Download: {int(status.progress() * 100)}%"
+                )
 
 
-# --------------------------------------------------
-# YOUTUBE UPLOAD
-# --------------------------------------------------
+# ==================================================
+# 12. YOUTUBE PUBLIC UPLOAD
+# ==================================================
 
 def upload_video(
     youtube,
@@ -479,8 +490,7 @@ def upload_video(
     title,
     description,
     tags,
-    category_id,
-    privacy
+    category_id
 ):
     body = {
         "snippet": {
@@ -490,7 +500,7 @@ def upload_video(
             "categoryId": str(category_id)
         },
         "status": {
-            "privacyStatus": privacy,
+            "privacyStatus": "public",
             "selfDeclaredMadeForKids": False
         }
     }
@@ -514,14 +524,16 @@ def upload_video(
         status, response = request.next_chunk()
 
         if status:
-            print(f"Upload: {int(status.progress() * 100)}%")
+            print(
+                f"Upload: {int(status.progress() * 100)}%"
+            )
 
     return response["id"]
 
 
-# --------------------------------------------------
-# MAIN AUTOMATION
-# --------------------------------------------------
+# ==================================================
+# 13. MAIN AUTOMATION
+# ==================================================
 
 def main():
     config = load_json(CONFIG_PATH, {})
@@ -550,16 +562,6 @@ def main():
             config.get("max_uploads_per_run", 1)
         )
     )
-
-    privacy = os.getenv(
-        "YOUTUBE_PRIVACY_STATUS",
-        config.get("privacy_status", "private")
-    ).strip().lower()
-
-    if privacy not in {"public", "unlisted", "private"}:
-        raise ValueError(
-            "YOUTUBE_PRIVACY_STATUS must be public, unlisted, or private."
-        )
 
     category_id = config.get("category_id", "27")
 
@@ -591,14 +593,12 @@ def main():
 
         name = item.get("name", "video.mp4")
 
-        # Avoid unsafe filename paths
         safe_filename = Path(name).name
         destination = DOWNLOAD_DIR / safe_filename
 
-        print("\n--------------------------------")
-        print(f"Processing: {name}")
-        print(f"Drive ID: {item['id']}")
-        print("--------------------------------")
+        print("\n================================")
+        print(f"Processing Drive file: {name}")
+        print("================================")
 
         download_drive_file(
             drive,
@@ -606,7 +606,6 @@ def main():
             destination
         )
 
-        # Generate metadata
         topic = extract_topic(name)
 
         title = generate_title(topic, history)
@@ -621,22 +620,20 @@ def main():
             config
         )
 
-        print(f"Topic: {topic}")
-        print(f"Title: {title}")
+        print(f"Detected topic: {topic}")
+        print(f"Generated title: {title}")
         print(f"Tags: {', '.join(tags)}")
+        print("Privacy: PUBLIC")
 
-        # Upload
         video_id = upload_video(
             youtube=youtube,
             filepath=destination,
             title=title,
             description=description,
             tags=tags,
-            category_id=category_id,
-            privacy=privacy
+            category_id=category_id
         )
 
-        # Save upload history
         history["uploaded_file_ids"].append(item["id"])
 
         history["uploads"].append({
@@ -646,7 +643,8 @@ def main():
             "youtube_video_id": video_id,
             "title": title,
             "description": description,
-            "tags": tags
+            "tags": tags,
+            "privacy": "public"
         })
 
         save_json(HISTORY_PATH, history)
@@ -660,8 +658,9 @@ def main():
         )
 
     print("\n================================")
-    print(f"Finished. Uploaded {completed} video(s).")
-    print("Metadata history saved successfully.")
+    print(f"Uploaded: {completed} video(s)")
+    print("Privacy: PUBLIC")
+    print("History saved.")
     print("================================")
 
 
