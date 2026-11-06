@@ -1,0 +1,16 @@
+{
+  "channel_name": "WhatHappensFactora",
+  "drive_folder_id": "PASTE_GOOGLE_DRIVE_FOLDER_ID_HERE",
+  "max_uploads_per_run": 1,
+  "privacy_status": "private",
+  "category_id": "27",
+  "description": "Learn something new with WhatHappensFactora. Subscribe for more facts and educational videos.",
+  "tags": [
+    "facts",
+    "education",
+    "knowledge",
+    "learning",
+    "interesting facts",
+    "did you know"
+  ]
+}
