@@ -1,6 +1,7 @@
+
 {
   "channel_name": "WhatHappensFactora",
-  "drive_folder_id": "PASTE_GOOGLE_DRIVE_FOLDER_ID_HERE",
+  "drive_folder_id": "",
   "max_uploads_per_run": 1,
   "privacy_status": "private",
   "category_id": "27",
