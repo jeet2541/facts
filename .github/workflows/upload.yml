@@ -1,29 +1,36 @@
 
-name: WhatHappensFactora YouTube Automation
+name: JeetStoryAI YouTube Automation
 
 on:
   workflow_dispatch:
 
   schedule:
-    # 12:30 PM IST
-    - cron: "0 7 * * *"
+    # 09:00 AM IST
+    - cron: "30 3 * * *"
 
-    # 4:30 PM IST
-    - cron: "0 11 * * *"
+    # 12:00 PM IST
+    - cron: "30 6 * * *"
 
-    # 7:00 PM IST
-    - cron: "30 13 * * *"
+    # 03:00 PM IST
+    - cron: "30 9 * * *"
+
+    # 06:00 PM IST
+    - cron: "30 12 * * *"
+
+    # 09:00 PM IST
+    - cron: "30 15 * * *"
 
 permissions:
   contents: write
 
 concurrency:
-  group: whathappensfactora-uploader
+  group: jeetstoryai-uploader
   cancel-in-progress: false
 
 jobs:
   upload:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repository
@@ -76,6 +83,7 @@ jobs:
           DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
           YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
           MAX_UPLOADS_PER_RUN: "1"
+          DAILY_UPLOAD_LIMIT: "5"
         run: python -u uploader.py
 
       - name: Save upload history
@@ -89,6 +97,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No upload history changes"
           else
-            git commit -m "Update upload history"
+            git commit -m "Update JeetStoryAI upload history"
             git push
           fi
