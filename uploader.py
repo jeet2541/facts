@@ -46,89 +46,224 @@ VIDEO_EXTENSIONS = {
 
 
 # ============================================================
-# TITLE AND DESCRIPTION GENERATION
+# TITLE AND DESCRIPTION GENERATION - JEETSTORYAI
 # ============================================================
 
-TITLE_HOOKS = [
-    "You Won't Believe This",
-    "The Truth Is Surprising",
-    "Most People Don't Know This",
-    "This Is Actually Real",
-    "Here's Something Interesting",
-    "The Hidden Truth",
-    "This Will Blow Your Mind",
-    "Wait Until You See This",
-    "An Incredible Fact",
-    "The World Is Full of Surprises",
-    "This Is More Interesting Than You Think",
-    "A Fact Worth Knowing",
+CHANNEL_NAME = "JeetStoryAI"
+
+# Broad Hindi storytelling hooks. These are intentionally not tied
+# to one particular story topic because the Drive filenames may vary.
+TITLE_POOL = [
+    "आखिर में जो हुआ, किसी ने सोचा भी नहीं था! 😱",
+    "इस कहानी का अंत आपको हैरान कर देगा! 🤯",
+    "एक ऐसी कहानी जो दिल छू जाएगी ❤️",
+    "आखिर सच क्या था? पूरा वीडियो देखिए!",
+    "जब किस्मत ने अचानक पलटी मारी! 😲",
+    "इस कहानी में छुपा है एक बड़ा ट्विस्ट!",
+    "आखिरी पल तक इंतजार करना! 😳",
+    "कभी-कभी सच कल्पना से भी अजीब होता है!",
+    "एक छोटा सा फैसला और सब कुछ बदल गया!",
+    "जो दिखता है, हमेशा वही सच नहीं होता!",
+    "इसका अंत बिल्कुल उम्मीद से अलग है! 😮",
+    "एक अनोखी कहानी, एक चौंकाने वाला मोड़!",
+    "आगे क्या हुआ, देखकर यकीन नहीं होगा!",
+    "इस कहानी ने सबको सोचने पर मजबूर कर दिया!",
+    "एक पल में बदल गई पूरी कहानी!",
+    "धैर्य रखिए, असली ट्विस्ट अंत में है!",
+    "कहानी का सबसे बड़ा राज आखिर खुल गया!",
+    "ऐसा मोड़ आपने पहले नहीं देखा होगा!",
+    "कभी किसी को कम मत समझना!",
+    "एक सीख जो जिंदगी भर याद रहेगी!",
+    "इस कहानी से आपको भी कुछ सीख मिलेगी!",
+    "अंत देखकर आपका दिल खुश हो जाएगा! 😊",
+    "एक ऐसा राज जिसने सबको चौंका दिया!",
+    "जब सच्चाई सबके सामने आई!",
+    "इस कहानी में आगे जो हुआ, कमाल था!",
+    "एक अनोखा सफर और यादगार सीख!",
+    "क्या आपने ऐसा कभी सोचा था?",
+    "यह कहानी अंत तक जरूर देखना!",
+    "आखिरकार उसे अपनी गलती समझ आ गई!",
+    "एक कहानी, कई भावनाएं और बड़ा ट्विस्ट!",
+    "सब कुछ सामान्य था… फिर अचानक ये हुआ!",
+    "आखिरी 5 सेकंड मिस मत करना! 😱",
+    "इस कहानी का संदेश बहुत खास है!",
+    "एक छोटी सी बात ने बड़ा बदलाव ला दिया!",
+    "जब उम्मीद ने हार नहीं मानी!",
+    "यह अंत आपकी सोच बदल सकता है!",
+    "कहानी का असली मतलब अंत में समझ आएगा!",
+    "जो हुआ, उसकी किसी को उम्मीद नहीं थी!",
+    "एक दिलचस्प कहानी जो आपको बांधे रखेगी!",
+    "इस कहानी में हर पल नया मोड़ है!",
+    "क्या अंत में सब ठीक हो पाएगा?",
+    "एक ऐसा पल जिसने सब बदल दिया!",
+    "कहानी का यह मोड़ याद रह जाएगा!",
+    "आखिर किसकी बात सच निकली?",
+    "एक मजेदार कहानी और शानदार ट्विस्ट! 😂",
+    "आखिर तक देखिए, जवाब मिल जाएगा!",
+    "इस कहानी को देखकर मुस्कुराना तय है!",
+    "एक अनोखी सीख के साथ छोटी सी कहानी!",
+    "जब एक राज ने पूरी कहानी बदल दी!",
+    "इस कहानी में छुपा संदेश जरूर समझना!",
+    "क्या आप इस कहानी का अंत समझ पाए?",
+    "कभी-कभी सबसे बड़ा जवाब खामोशी होती है!",
+    "यह कहानी आपको हैरान भी करेगी और हंसाएगी!",
+    "एक अप्रत्याशित मोड़ जिसने सबको चौंका दिया!",
+    "आखिर में मिला सबसे बड़ा सबक!",
+    "इस कहानी को बीच में मत छोड़ना!",
+    "एक छोटी कहानी, लेकिन बड़ी सीख!",
+    "क्या सच में ऐसा हो सकता है?",
+    "इस कहानी का ट्विस्ट लाजवाब है!",
+    "जब सबने उम्मीद छोड़ दी, तभी चमत्कार हुआ!",
+    "एक ऐसा फैसला जिसका असर सब पर पड़ा!",
+    "कहानी का सबसे जरूरी हिस्सा अंत में है!",
+    "आप होते तो क्या फैसला लेते?",
+    "इस कहानी ने सबका नजरिया बदल दिया!",
+    "अंत देखकर आप भी यही कहेंगे—वाह!",
+    "किसी ने नहीं सोचा था कि ऐसा होगा!",
+    "एक अनोखी घटना और उसका हैरान करने वाला अंत!",
+    "यह कहानी आपको अंत तक रोके रखेगी!",
+    "एक गलती और फिर शुरू हुई नई कहानी!",
+    "सच्चाई सामने आते ही सब बदल गया!",
+    "इस कहानी का जवाब आपको अंत में मिलेगा!",
+    "एक दिलचस्प मोड़ जिसे मिस नहीं करना चाहिए!",
+    "कहानी छोटी है, लेकिन बात बड़ी है!",
+    "जब एक साधारण दिन बन गया यादगार!",
+    "आखिर कौन सही था? कहानी देखिए!",
+    "यह मोड़ देखकर आप चौंक जाएंगे!",
+    "एक ऐसी सीख जो हर किसी को जाननी चाहिए!",
+    "क्या आपने कहानी का छुपा हुआ संकेत देखा?",
+    "आखिरकार इंतजार का फल मिल गया!",
+    "इस कहानी में सबसे खास बात क्या थी?",
+    "एक पल की समझदारी ने सब बदल दिया!",
+    "यह कहानी आपको सोचने पर मजबूर करेगी!",
+    "कहानी का अंत दिल जीत लेगा!",
+    "ऐसा ट्विस्ट जिसकी उम्मीद नहीं थी!",
+    "आखिर में खुला सबसे बड़ा रहस्य!",
+    "एक नई कहानी, एक नया अनुभव!",
+    "क्या आप अंत का अंदाजा लगा सकते हैं?",
+    "इस कहानी में आगे बहुत कुछ होने वाला है!",
+    "कभी हार मत मानना—यह कहानी यही सिखाती है!",
+    "एक छोटा सा राज और बड़ा खुलासा!",
+    "जो हुआ, उससे सब हैरान रह गए!",
+    "यह कहानी आखिरी सेकंड तक देखना!",
+    "एक मजेदार मोड़ जिसने माहौल बदल दिया!",
+    "इस कहानी का असली हीरो कौन है?",
+    "एक ऐसी बात जो देर से समझ आई!",
+    "कहानी का अंत देखकर दिल खुश हो जाएगा!",
+    "क्या आखिर में सच जीत पाएगा?",
+    "एक अनोखी कहानी जिसे आप भूल नहीं पाएंगे!",
+    "इस कहानी में छुपा है जिंदगी का सबक!",
+    "आखिर ऐसा क्यों हुआ? जानिए पूरी कहानी!",
+    "एक फैसला, और बदल गई पूरी दुनिया!",
+    "किसी ने नहीं देखा था यह मोड़ आते हुए!",
+    "यह छोटी सी कहानी बहुत कुछ कहती है!",
+    "आखिरी पल में हुआ सबसे बड़ा खुलासा!",
+    "कहानी का यह हिस्सा सबसे खास है!",
+    "क्या आप इस रहस्य को सुलझा पाएंगे?",
+    "एक ऐसी कहानी जिसका अंत याद रहेगा!",
+    "जब सच्चाई ने सबको चुप करा दिया!",
+    "इस कहानी में हंसी भी है और सीख भी!",
+    "अंत तक देखिए—कहानी अभी बाकी है!",
+    "एक अनोखा मोड़ और शानदार अंत!",
+    "इस कहानी से मिलने वाली सीख अनमोल है!",
+    "आखिर किस्मत ने क्या खेल खेला?",
+    "एक पल ने सबकी जिंदगी बदल दी!",
+    "इस कहानी का आखिरी सीन कमाल है!",
+    "क्या आप भी यही सोच रहे थे?",
+    "एक कहानी जो आपको अंत तक बांधे रखेगी!",
+    "आखिरकार राज से पर्दा उठ ही गया!",
+    "देखिए कैसे बदल गई पूरी कहानी!",
+    "यह अंत बिल्कुल अप्रत्याशित था!",
+    "कहानी का ट्विस्ट देखकर हो जाएंगे हैरान!",
+    "एक छोटी सी कहानी, बड़ा सा संदेश!",
+    "आखिर में जो सीख मिली, वह अनमोल है!",
 ]
 
-TITLE_TEMPLATES = [
-    "{hook}!",
-    "{hook} 🤯",
-    "{hook} | Amazing Facts",
-    "{hook} | Did You Know?",
-    "{hook} | Interesting Facts",
-    "{hook} | Facts You Should Know",
-    "{hook} | Mind Blowing Facts",
-    "{hook} | Knowledge Shorts",
-    "{hook} | Unbelievable Facts",
-    "{hook} | Fact of the Day",
-    "{hook} | Learn Something New",
-    "{hook} | What Happens?",
+DESCRIPTION_TEMPLATES = [
+    (
+        "देखिए JeetStoryAI की एक नई हिंदी कहानी! 🎬\n"
+        "इस AI animated story में कहानी, मनोरंजन और एक दिलचस्प मोड़ आपका इंतजार कर रहा है। "
+        "वीडियो को अंत तक देखें और बताएं कि आपको इसका कौन-सा हिस्सा सबसे अच्छा लगा।\n\n"
+        "ऐसी ही Hindi stories, animated kahaniyan और entertaining Shorts के लिए "
+        "JeetStoryAI को Subscribe करें। ❤️\n\n"
+        "#Shorts #HindiStories #HindiKahani #AIAnimation #AnimatedStories "
+        "#YouTubeShorts #ShortsFeed #ViralShorts"
+    ),
+    (
+        "एक नई कहानी, एक नया अनुभव! 🍿\n"
+        "JeetStoryAI पर देखिए Hindi storytelling और AI-generated animation का मजेदार संगम। "
+        "अंत तक जरूर देखें—और अपनी राय Comment में बताएं!\n\n"
+        "नई कहानियों के लिए Channel को Subscribe करें और वीडियो पसंद आए तो Like करें।\n\n"
+        "#Shorts #HindiKahani #HindiStory #AIStory #3DAnimation "
+        "#CartoonStories #ShortsFeed #ViralShorts"
+    ),
+    (
+        "आपके लिए पेश है JeetStoryAI की एक और entertaining Hindi story! ✨\n"
+        "यह animated short मनोरंजन के साथ एक दिलचस्प संदेश भी लेकर आया है। "
+        "पूरा वीडियो देखें और बताएं: आपको इसका अंत कैसा लगा?\n\n"
+        "ऐसी और Hindi animated stories के लिए JeetStoryAI से जुड़े रहें।\n\n"
+        "#Shorts #HindiStories #AnimatedStory #AIAnimation #HindiCartoon "
+        "#YTShorts #ShortsFeed #ViralShorts"
+    ),
+    (
+        "कहानियों की दुनिया में आपका स्वागत है! 🎥\n"
+        "JeetStoryAI पर मिलेंगी नई Hindi kahaniyan, AI animated stories और "
+        "छोटे-छोटे मनोरंजक वीडियो। इस कहानी को अंत तक देखें!\n\n"
+        "Like, Comment और Subscribe करना न भूलें। ❤️\n\n"
+        "#Shorts #HindiKahaniyan #AIgenerated #AnimationVideo #StoryTime "
+        "#YouTubeShorts #ShortsFeed #ViralShorts"
+    ),
 ]
-
-CHANNEL_DESCRIPTION = (
-    "Discover fascinating facts, surprising knowledge, and interesting "
-    "things about the world. Subscribe to WhatHappensFactora for more "
-    "informative videos and Shorts!\n\n"
-    "#Shorts #Facts #Knowledge #DidYouKnow"
-)
 
 BASE_TAGS = [
-    "facts",
-    "interesting facts",
-    "amazing facts",
-    "did you know",
-    "knowledge",
-    "educational shorts",
+    "JeetStoryAI",
+    "hindi story",
+    "hindi stories",
+    "hindi kahani",
+    "hindi kahaniya",
+    "hindi kahaniyan",
+    "animated stories",
+    "hindi animated story",
+    "ai story",
+    "ai generated story",
+    "ai animation",
+    "3d animation",
+    "hindi cartoon",
+    "cartoon story",
+    "moral stories",
+    "short story",
+    "storytelling",
+    "hindi shorts",
     "youtube shorts",
     "shorts",
-    "WhatHappensFactora",
+    "viral shorts",
+    "shorts feed",
+    "yt shorts",
+    "entertainment",
+    "story video",
+    "animated video",
+    "hindi animation",
+    "new hindi story",
 ]
 
 
 def generate_metadata(file_id, filename):
     """
-    Generates a title without exposing the original Drive filename.
-    Tags may use meaningful words from the filename.
+    Generates broad Hindi storytelling metadata for JeetStoryAI.
+    Titles are selected from a pool of 100+ general hooks, not from
+    a particular topic or the original Drive filename.
     """
 
     seed = sum(ord(char) for char in file_id)
     rng = random.Random(seed)
 
-    hook = rng.choice(TITLE_HOOKS)
-    template = rng.choice(TITLE_TEMPLATES)
+    title = rng.choice(TITLE_POOL)
+    description = rng.choice(DESCRIPTION_TEMPLATES)
 
-    title = template.format(hook=hook)
+    # Keep tags unique and within YouTube's practical tag-count limit.
+    tags = list(dict.fromkeys(BASE_TAGS))[:30]
 
-    # Keep title within YouTube's title limit.
-    title = title[:100].strip()
-
-    # Extract useful words from filename for tags only.
-    stem = Path(filename).stem.lower()
-    words = re.findall(r"[a-z]{3,}", stem)
-
-    filename_tags = []
-    for word in words:
-        if word not in filename_tags:
-            filename_tags.append(word)
-
-    tags = list(dict.fromkeys(BASE_TAGS + filename_tags))
-    tags = tags[:30]
-
-    return title, CHANNEL_DESCRIPTION, tags
+    return title[:100].strip(), description, tags
 
 
 # ============================================================
@@ -327,7 +462,7 @@ def download_video(drive_service, file_id, filename):
     suffix = Path(filename).suffix.lower() or ".mp4"
 
     temporary_file = tempfile.NamedTemporaryFile(
-        prefix="whf_",
+        prefix="jsai_",
         suffix=suffix,
         delete=False,
     )
@@ -554,7 +689,7 @@ def main():
         raise ValueError("MAX_UPLOADS_PER_RUN must be at least 1.")
 
     print("=" * 55)
-    print("WHAT HAPPENS FACTORA - YOUTUBE AUTOMATION")
+    print("JEETSTORYAI - YOUTUBE AUTOMATION")
     print("=" * 55)
 
     credentials = get_credentials()
